@@ -1,37 +1,42 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
+class DurationCategory(models.Model):
+    class DurationType(models.TextChoices):
+        BREAK = 'break', _('Break')
+        WORK = 'work', _('Work')
+
+    type = models.CharField(max_length=10, choices=DurationType.choices, verbose_name=_('Duration'))
+    minutes = models.PositiveIntegerField(_('Minutes'), default=0)
+    is_active = models.BooleanField(_('Active'), default=True)
+    created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
+
+    def __str__(self):
+        return self.type
+
+    class Meta:
+        verbose_name = _('Duration')
+        verbose_name_plural = _('Durations')
 
 
 class PomodoroSession(models.Model):
-    class WorkDuration(models.IntegerChoices):
-        TWENTY = 20, '20 minutes'
-        TWENTY_FIVE = 25, '25 minutes'
-        THIRTY = 30, '30 minutes'
-
-    class BreakDuration(models.IntegerChoices):
-        THREE = 3, '3 minutes'
-        FIVE = 5, '5 minutes'
-        SEVEN = 7, '7 minutes'
-
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='sessions')
-    start_time = models.DateTimeField(auto_now_add=True)
-    duration = models.PositiveIntegerField()
-    is_break = models.BooleanField(default=False)
-    completed = models.BooleanField(default=True)
+    category = models.ForeignKey(DurationCategory, on_delete=models.CASCADE,
+                                 verbose_name=_('Category'), related_name='pomodoro_sessions')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='sessions', verbose_name=_('user'))
+    start_time = models.DateTimeField(auto_now_add=True, verbose_name=_('start time'))
+    duration = models.PositiveIntegerField(_('Duration'), default=0)
+    completed = models.BooleanField(default=True, verbose_name=_('completed'))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_('updated at'))
 
     def save(self, *args, **kwargs):
-        if self.is_break:
-            valid_choices = [x.value for x in self.BreakDuration]
-        else:
-            valid_choices = [x.value for x in self.WorkDuration]
-
-        if self.duration not in valid_choices:
-            raise ValueError(f"Invalid duration {self.duration} for is_break={self.is_break}")
-
+        self.completed = self.duration > 0
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{'Break' if self.is_break else 'Work'}: {self.duration} min"
+        return _(f"{self.user} - {'Break' if self.is_break else 'Work'}")
 
     class Meta:
-        verbose_name = 'Pomodoro Session'
-        verbose_name_plural = 'Pomodoro Sessions'
+        verbose_name = _('Pomodoro Session')
+        verbose_name_plural = _('Pomodoro Sessions')

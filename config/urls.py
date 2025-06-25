@@ -23,15 +23,15 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('users.urls')),
-    path('focus', include('focus.urls')),
+    path('focus/', include('focus.urls')),
     path('friends/', include('friends.urls')),
     path('marketplace/', include('marketplace.urls')),
-    path('rewards', include('rewards.urls')),
+    path('rewards/', include('rewards.urls')),
 ]
 
 urlpatterns += [
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
 
 if settings.DEBUG:
