@@ -42,6 +42,7 @@ jsonschema==4.24.0
 jsonschema-specifications==2025.4.1
 msgpack==1.1.1
 packaging==25.0
+pillow==11.2.1
 proto-plus==1.26.1
 protobuf==6.31.1
 psycopg2-binary==2.9.10
